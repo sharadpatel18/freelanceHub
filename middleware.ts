@@ -17,8 +17,6 @@ export async function middleware(req: NextRequest) {
   // Only check protected paths
   if (protectedPaths.some((path) => pathname.startsWith(path))) {
     const token = await getToken({ req, secret: SECRET });
-    console.log("token", token);
-
     if (!token) {
       // Redirect to login if no session
       const loginUrl = req.nextUrl.clone();
