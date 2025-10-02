@@ -1,6 +1,7 @@
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Bell, Search, Settings } from "lucide-react"
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Bell, Search, Settings } from "lucide-react";
+import { ModeToggle } from "./ui/theme-toggle";
 
 export function DashboardHeader() {
   return (
@@ -13,16 +14,28 @@ export function DashboardHeader() {
               <a href="/" className="text-primary font-medium">
                 Overview
               </a>
-              <a href="/" className="text-muted-foreground hover:text-foreground">
+              <a
+                href="/"
+                className="text-muted-foreground hover:text-foreground"
+              >
                 Projects
               </a>
-              <a href="/" className="text-muted-foreground hover:text-foreground">
+              <a
+                href="/"
+                className="text-muted-foreground hover:text-foreground"
+              >
                 Clients
               </a>
-              <a href="/" className="text-muted-foreground hover:text-foreground">
+              <a
+                href="/"
+                className="text-muted-foreground hover:text-foreground"
+              >
                 Invoices
               </a>
-              <a href="/" className="text-muted-foreground hover:text-foreground">
+              <a
+                href="/"
+                className="text-muted-foreground hover:text-foreground"
+              >
                 Analytics
               </a>
             </nav>
@@ -31,9 +44,7 @@ export function DashboardHeader() {
             <Button variant="ghost" size="icon">
               <Search className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon">
-              <Bell className="h-4 w-4" />
-            </Button>
+            <ModeToggle />
             <Button variant="ghost" size="icon">
               <Settings className="h-4 w-4" />
             </Button>
@@ -45,5 +56,5 @@ export function DashboardHeader() {
         </div>
       </div>
     </header>
-  )
+  );
 }
