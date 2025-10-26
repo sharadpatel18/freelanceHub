@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { signupSchema } from "@/validations/auth-validations";
 import bcrypt from "bcrypt";
 import { db } from "@/db/client";
+import { eq } from "drizzle-orm";
 import { usersTable } from "@/db/schema/user";
 
 export async function POST(request: Request) {
@@ -17,6 +18,17 @@ export async function POST(request: Request) {
       });
     }
     const validData = result.data;
+    const existingUser = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.email, validData.email));
+
+    if (existingUser.length > 0) {
+      return NextResponse.json(
+        { message: "User already exists" },
+        { status: 400 }
+      );
+    }
     const hashedPassword = await bcrypt.hash(validData.password, 10);
     const user = {
       ...validData,
@@ -25,11 +37,16 @@ export async function POST(request: Request) {
 
     const createUser = await db.insert(usersTable).values(user).returning();
 
-    return NextResponse.json({
-      message: "User created successfully",
-      data: createUser,
-    });
-  } catch (error: unknown) {
+    return NextResponse.json(
+      {
+        message: "User created successfully",
+        data: createUser,
+      },
+      {
+        status: 201,
+      }
+    );
+  } catch (error) {
     console.error(error);
     return NextResponse.json({
       message: "Something went wrong",
