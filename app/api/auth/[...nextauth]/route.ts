@@ -35,7 +35,7 @@ const authOptions: NextAuthOptions = {
         const isPasswordValid = bcrypt.compareSync(password, user.password);
         if (!isPasswordValid) throw new Error("password is incorrect");
 
-        return { id: user.id, email: user.email };
+        return { id: user.id, name: user.name, email: user.email };
       },
     }),
   ],
@@ -63,13 +63,23 @@ const authOptions: NextAuthOptions = {
       return true;
     },
 
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-        token.email = user.email;
+    async jwt({ token, user, account }) {
+      if (account && user?.email) {
+        const dbUser = await db
+          .select()
+          .from(users)
+          .where(eq(users.email, user.email))
+          .limit(1);
+
+        if (dbUser.length) {
+          token.id = dbUser[0].id;
+          token.email = dbUser[0].email;
+        }
       }
+
       return token;
     },
+
     async session({ session, token }) {
       session.user.id = String(token.id);
       return session;
