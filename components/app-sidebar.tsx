@@ -31,6 +31,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import Image from "next/image"
+import { redirect } from "next/navigation"
 
 const data = {
   user: {
@@ -111,7 +112,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
         <SidebarMenu>
-          <SidebarMenuItem className="flex items-center gap-2 px-2">
+          <SidebarMenuItem className="flex items-center gap-2 px-2" onClick={() => redirect("/home")}>
             <div className="p-2 bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg">
               <Briefcase className="h-6 w-6 text-primary" />
             </div>
