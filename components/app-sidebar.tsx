@@ -2,22 +2,20 @@
 
 import * as React from "react"
 import {
-  IconCamera,
-  IconChartBar,
-  IconDashboard,
-  IconDatabase,
-  IconFileAi,
-  IconFileDescription,
-  IconFileWord,
-  IconFolder,
-  IconHelp,
-  IconInnerShadowTop,
-  IconListDetails,
-  IconReport,
-  IconSearch,
-  IconSettings,
-  IconUsers,
-} from "@tabler/icons-react"
+  Briefcase,
+  BarChart3,
+  LayoutDashboard,
+  DollarSign,
+  FileText,
+  HelpCircle,
+  MessageCircle,
+  Search,
+  Settings,
+  Star,
+  TrendingUp,
+  User,
+  Users,
+} from "lucide-react"
 
 import { NavDocuments } from "@/components/nav-documents"
 import { NavMain } from "@/components/nav-main"
@@ -36,117 +34,74 @@ import Image from "next/image"
 
 const data = {
   user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
+    name: "John Doe",
+    email: "john@freelancehub.com",
+    avatar: "/avatars/john-doe.jpg",
   },
   navMain: [
     {
       title: "Dashboard",
-      url: "#",
-      icon: IconDashboard,
+      url: "/dashboard",
+      icon: LayoutDashboard,
     },
     {
-      title: "Lifecycle",
-      url: "#",
-      icon: IconListDetails,
+      title: "My Projects",
+      url: "/projects",
+      icon: Briefcase,
+    },
+    {
+      title: "Proposals",
+      url: "/proposals",
+      icon: FileText,
+    },
+    {
+      title: "Messages",
+      url: "/messages",
+      icon: MessageCircle,
+    },
+    {
+      title: "Earnings",
+      url: "/earnings",
+      icon: DollarSign,
     },
     {
       title: "Analytics",
-      url: "#",
-      icon: IconChartBar,
-    },
-    {
-      title: "Projects",
-      url: "#",
-      icon: IconFolder,
-    },
-    {
-      title: "Team",
-      url: "#",
-      icon: IconUsers,
-    },
-  ],
-  navClouds: [
-    {
-      title: "Capture",
-      icon: IconCamera,
-      isActive: true,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Proposal",
-      icon: IconFileDescription,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Prompts",
-      icon: IconFileAi,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
+      url: "/analytics",
+      icon: BarChart3,
     },
   ],
   navSecondary: [
     {
+      title: "Profile",
+      url: "/profile",
+      icon: User,
+    },
+    {
       title: "Settings",
-      url: "#",
-      icon: IconSettings,
+      url: "/settings",
+      icon: Settings,
     },
     {
-      title: "Get Help",
-      url: "#",
-      icon: IconHelp,
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: IconSearch,
+      title: "Help & Support",
+      url: "/help",
+      icon: HelpCircle,
     },
   ],
   documents: [
     {
-      name: "Data Library",
-      url: "#",
-      icon: IconDatabase,
+      name: "Portfolio",
+      url: "/portfolio",
+      icon: Star,
     },
     {
-      name: "Reports",
-      url: "#",
-      icon: IconReport,
+      name: "Reviews",
+      url: "/reviews",
+      icon: TrendingUp,
     },
     {
-      name: "Word Assistant",
-      url: "#",
-      icon: IconFileWord,
+      name: "Clients",
+      url: "/clients",
+      icon: Users,
     },
   ],
 }
@@ -156,8 +111,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
         <SidebarMenu>
-          <SidebarMenuItem className="flex items-center">
-            <Image src="/platform-icon.png" alt="test" width={200} height={200} />
+          <SidebarMenuItem className="flex items-center gap-2 px-2">
+            <div className="p-2 bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg">
+              <Briefcase className="h-6 w-6 text-primary" />
+            </div>
+            <span className="text-lg font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              FreelanceHub
+            </span>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
@@ -172,3 +132,4 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     </Sidebar>
   )
 }
+
