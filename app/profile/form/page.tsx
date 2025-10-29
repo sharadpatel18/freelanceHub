@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,21 +18,29 @@ import { Badge } from "@/components/ui/badge";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
-import { X, User, Briefcase, MapPin, DollarSign } from "lucide-react";
+import { X, User, Briefcase, MapPin, DollarSign, Loader2, Upload, Image as ImageIcon, Check } from "lucide-react";
+import { toast } from "sonner";
+import { useSession } from "next-auth/react";
+import { completeProfile, uploadUserImage } from "@/services/auth-services";
 
 export default function CompleteProfilePage() {
+    const { data: session, status } = useSession();
     const router = useRouter();
     const [loading, setLoading] = useState(false);
-
+    const [uploadingImage, setUploadingImage] = useState(false);
+    const [imageUploaded, setImageUploaded] = useState(false);
     const [formData, setFormData] = useState({
         username: "",
         bio: "",
         about: "",
         location: "",
         timezone: "",
-        hourlyRate: "",
+        hourlyRate: 0,
         profileImage: "",
     });
+    const [isImageUploadedSuccessfully, setIsImageUploadedSuccessfully] = useState<boolean>(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [imagePreview, setImagePreview] = useState<string>("");
 
     const [skills, setSkills] = useState<string[]>([]);
     const [skillInput, setSkillInput] = useState("");
@@ -40,8 +48,103 @@ export default function CompleteProfilePage() {
     const [languages, setLanguages] = useState<string[]>([]);
     const [languageInput, setLanguageInput] = useState("");
 
+    // Handle authentication and verification checks
+    useEffect(() => {
+        if (status === "loading") return;
+
+        if (status === "unauthenticated") {
+            router.push("/login");
+            return;
+        }
+
+        if (status === "authenticated" && session?.user) {
+            if (session.user.isVerified) {
+                router.push("/dashboard");
+                return;
+            }
+        }
+    }, [status, session, router]);
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+
+        // For hourlyRate specifically, store as number and validate
+        if (name === "hourlyRate") {
+            const numericValue = Number(value);
+
+            // Prevent negative or zero
+            if (numericValue <= 0) {
+                setFormData((prev) => ({ ...prev, hourlyRate: 1 })); // fallback to minimum 1
+            } else {
+                setFormData((prev) => ({ ...prev, hourlyRate: numericValue }));
+            }
+            return;
+        }
+
+        // For all other fields
+        setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                toast.error('Please select an image file');
+                return;
+            }
+
+            // Validate file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                toast.error('Image size should be less than 5MB');
+                return;
+            }
+
+            setSelectedFile(file);
+            setImageUploaded(false);
+            setFormData({ ...formData, profileImage: "" });
+
+            // Create preview
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const removeImage = () => {
+        setSelectedFile(null);
+        setImagePreview("");
+        setImageUploaded(false);
+        setFormData({ ...formData, profileImage: "" });
+    };
+
+    const handleUploadImage = async () => {
+        if (!selectedFile) {
+            toast.error("Please select an image first");
+            return;
+        }
+
+        setUploadingImage(true);
+
+        try {
+            const imageFormData = new FormData();
+            imageFormData.append('file', selectedFile);
+
+            const res = await uploadUserImage(imageFormData);
+            console.log(res);
+            setIsImageUploadedSuccessfully(true);
+            setFormData({ ...formData, profileImage: res.data.url });
+            setImageUploaded(true);
+            toast.success("Image uploaded successfully!");
+        } catch (error) {
+            console.error("Error uploading image:", error);
+            toast.error("An error occurred while uploading the image");
+        } finally {
+            setUploadingImage(false);
+        }
     };
 
     const addSkill = () => {
@@ -68,32 +171,44 @@ export default function CompleteProfilePage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Check if image is selected but not uploaded
+        // if (!isImageUploadedSuccessfully) {
+        //     toast.error("Please upload the selected image before submitting");
+        //     return;
+        // }
+
         setLoading(true);
 
         try {
-            const response = await fetch("/api/profile/complete", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    ...formData,
-                    skills,
-                    languages,
-                    hourlyRate: formData.hourlyRate ? parseFloat(formData.hourlyRate) : null,
-                }),
-            });
-
-            if (response.ok) {
-                router.push("/dashboard");
-            } else {
-                alert("Failed to update profile");
-            }
+            const res = await completeProfile({ ...formData, skills, languages });
+            console.log(res);
+            toast.success("Profile updated successfully!");
+            router.push("/dashboard");
         } catch (error) {
             console.error("Error updating profile:", error);
-            alert("An error occurred");
+            toast.error("An error occurred while updating your profile");
         } finally {
             setLoading(false);
         }
     };
+
+    // Show loading state while checking authentication
+    if (status === "loading") {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center space-y-4">
+                    <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+                    <p className="text-muted-foreground">Loading...</p>
+                </div>
+            </div>
+        );
+    }
+
+    // Don't render anything if not authenticated or already verified (redirecting)
+    if (status === "unauthenticated" || session?.user?.isVerified) {
+        return null;
+    }
 
     return (
         <SidebarProvider
@@ -144,15 +259,80 @@ export default function CompleteProfilePage() {
                                             </div>
 
                                             <div className="space-y-2">
-                                                <Label htmlFor="profileImage">Profile Image URL</Label>
-                                                <Input
-                                                    id="profileImage"
-                                                    name="profileImage"
-                                                    value={formData.profileImage}
-                                                    onChange={handleInputChange}
-                                                    placeholder="https://example.com/image.jpg"
-                                                    type="url"
-                                                />
+                                                <Label htmlFor="profileImage">Profile Image</Label>
+                                                <div className="flex flex-col gap-3">
+                                                    <div className="flex gap-2">
+                                                        <Input
+                                                            id="profileImage"
+                                                            type="file"
+                                                            accept="image/*"
+                                                            onChange={handleFileChange}
+                                                            className="cursor-pointer"
+                                                            disabled={uploadingImage}
+                                                        />
+                                                        {imagePreview && (
+                                                            <Button
+                                                                type="button"
+                                                                variant="outline"
+                                                                size="icon"
+                                                                onClick={removeImage}
+                                                                className="shrink-0"
+                                                                disabled={uploadingImage}
+                                                            >
+                                                                <X className="h-4 w-4" />
+                                                            </Button>
+                                                        )}
+                                                    </div>
+
+                                                    {imagePreview && (
+                                                        <div className="flex items-center gap-3">
+                                                            {/* Image preview */}
+                                                            <div className="w-24 h-24 rounded-lg border-2 border-border overflow-hidden">
+                                                                <img
+                                                                    src={imagePreview}
+                                                                    alt="Preview"
+                                                                    className="w-full h-full object-cover"
+                                                                />
+                                                            </div>
+
+                                                            {/* Upload button */}
+                                                            {!imageUploaded ? (
+                                                                <Button
+                                                                    type="button"
+                                                                    variant="default"
+                                                                    size="sm"
+                                                                    className="shrink-0"
+                                                                    onClick={handleUploadImage}
+                                                                    disabled={uploadingImage}
+                                                                >
+                                                                    {uploadingImage ? (
+                                                                        <>
+                                                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                                            Uploading...
+                                                                        </>
+                                                                    ) : (
+                                                                        <>
+                                                                            <Upload className="mr-2 h-4 w-4" />
+                                                                            Upload Image
+                                                                        </>
+                                                                    )}
+                                                                </Button>
+                                                            ) : (
+                                                                <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+                                                                    <Check className="h-4 w-4" />
+                                                                    <span className="font-medium">Image uploaded successfully!</span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    )}
+
+                                                    {!imagePreview && (
+                                                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                            <ImageIcon className="h-4 w-4" />
+                                                            <span>Max size: 5MB • Supported: JPG, PNG, GIF</span>
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
 
@@ -169,7 +349,7 @@ export default function CompleteProfilePage() {
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="about">About You</Label>
+                                            <Label htmlFor="about">About You *</Label>
                                             <Textarea
                                                 id="about"
                                                 name="about"
@@ -177,6 +357,7 @@ export default function CompleteProfilePage() {
                                                 onChange={handleInputChange}
                                                 placeholder="Tell us more about your experience and expertise..."
                                                 rows={5}
+                                                required
                                             />
                                         </div>
                                     </CardContent>
@@ -205,12 +386,13 @@ export default function CompleteProfilePage() {
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <Label htmlFor="timezone">Timezone</Label>
+                                                <Label htmlFor="timezone">Timezone *</Label>
                                                 <Select
                                                     value={formData.timezone}
                                                     onValueChange={(value) =>
                                                         setFormData({ ...formData, timezone: value })
                                                     }
+                                                    required
                                                 >
                                                     <SelectTrigger>
                                                         <SelectValue placeholder="Select timezone" />
@@ -229,7 +411,7 @@ export default function CompleteProfilePage() {
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="hourlyRate">Hourly Rate (USD)</Label>
+                                            <Label htmlFor="hourlyRate">Hourly Rate (USD) *</Label>
                                             <div className="relative">
                                                 <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                                 <Input
@@ -237,10 +419,12 @@ export default function CompleteProfilePage() {
                                                     name="hourlyRate"
                                                     type="number"
                                                     step="0.01"
+                                                    min="1"
                                                     value={formData.hourlyRate}
                                                     onChange={handleInputChange}
                                                     placeholder="75.00"
                                                     className="pl-9"
+                                                    required
                                                 />
                                             </div>
                                         </div>
@@ -314,7 +498,7 @@ export default function CompleteProfilePage() {
 
                                         {/* Languages */}
                                         <div className="space-y-2">
-                                            <Label htmlFor="languages">Languages</Label>
+                                            <Label htmlFor="languages">Languages *</Label>
                                             <div className="flex gap-2">
                                                 <Input
                                                     id="languages"
@@ -332,6 +516,9 @@ export default function CompleteProfilePage() {
                                                     Add
                                                 </Button>
                                             </div>
+                                            {languages.length === 0 && (
+                                                <p className="text-sm text-muted-foreground">At least one language is required</p>
+                                            )}
                                             {languages.length > 0 && (
                                                 <div className="flex flex-wrap gap-2 mt-3">
                                                     {languages.map((language, index) => {
@@ -363,20 +550,32 @@ export default function CompleteProfilePage() {
                                 </Card>
 
                                 {/* Submit Button */}
-                                <div className="flex justify-end gap-3">
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        onClick={() => router.push("/dashboard")}
-                                        disabled={loading}
-                                    >
-                                        Skip for Now
-                                    </Button>
+                                <div className="flex justify-end">
                                     <Button
                                         type="submit"
-                                        disabled={loading || skills.length === 0 || !formData.username || !formData.bio || !formData.location}
+                                        // disabled={
+                                        //     loading ||
+                                        //     uploadingImage ||
+                                        //     skills.length === 0 ||
+                                        //     languages.length === 0 ||
+                                        //     !formData.username ||
+                                        //     !formData.bio ||
+                                        //     !formData.about ||
+                                        //     !formData.location ||
+                                        //     !formData.timezone ||
+                                        //     !formData.hourlyRate ||
+                                        //     (selectedFile && !imageUploaded)
+                                        // }
+                                        className="min-w-[200px]"
                                     >
-                                        {loading ? "Saving..." : "Complete Profile"}
+                                        {loading ? (
+                                            <>
+                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                Saving...
+                                            </>
+                                        ) : (
+                                            "Complete Profile"
+                                        )}
                                     </Button>
                                 </div>
                             </form>

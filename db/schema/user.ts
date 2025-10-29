@@ -30,6 +30,7 @@ export const usersTable = pgTable("users", {
   languages: text("languages").array(), // Array of strings
   hourlyRate: real("hourly_rate"), // Use real for decimal numbers
   isVerified: boolean("is_verified").default(false).notNull(),
+  isEmailVerified: boolean("is_email_verified").default(false).notNull(),
 
   // Timestamps
   createdAt: timestamp("created_at").defaultNow().notNull(),

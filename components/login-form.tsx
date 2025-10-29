@@ -18,11 +18,16 @@ import Link from "next/link"
 import { useState } from "react"
 import { signIn } from "next-auth/react"
 import { toast } from "sonner"
+import { useSession } from "next-auth/react"
+import { redirect } from "next/navigation"
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const { data: session } = useSession()
+  console.log(session);
+
   const [formData, setFormData] = useState({
     email: "",
     password: ""
@@ -46,11 +51,18 @@ export function LoginForm({
     } else {
       toast.error("Login failed!")
     }
+
+    if (session?.user.isVerified) {
+      redirect("/home")
+    } else {
+      redirect("/profile/form")
+    }
   }
 
   const handleGoogleSubmit = async () => {
-    const res = await signIn("google", {
-      callbackUrl: "/"
+    await signIn("google", {
+      redirect: false,
+      callbackUrl: "/profile/form"
     })
   }
 
