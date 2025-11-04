@@ -9,25 +9,21 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
-import { 
-  Briefcase, 
-  DollarSign, 
-  TrendingUp, 
+import {
+  Briefcase,
+  DollarSign,
+  TrendingUp,
   TrendingDown,
   Clock,
   Star,
-  Users,
   MessageCircle,
   FileText,
   Calendar,
   Target,
   Award,
   Zap,
-  ArrowUpRight,
-  ArrowDownRight,
   Eye,
   CheckCircle,
-  AlertCircle
 } from "lucide-react"
 
 export default function Page() {
@@ -43,14 +39,14 @@ export default function Page() {
       <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader />
-        
+
         <div className="min-h-screen bg-background">
           {/* Welcome Section */}
           <section className="py-8 px-6 relative overflow-hidden">
             {/* Background Gradient */}
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5" />
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-            
+
             <div className="container mx-auto relative z-10">
               <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8">
                 <div>

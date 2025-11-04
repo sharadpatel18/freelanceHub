@@ -11,23 +11,14 @@ import { Progress } from "@/components/ui/progress"
 import {
     DollarSign,
     TrendingUp,
-    TrendingDown,
     Download,
     Calendar,
     CreditCard,
     Wallet,
-    ArrowUpRight,
-    ArrowDownRight,
     CheckCircle,
     Clock,
     Filter
 } from "lucide-react"
-import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from "@/components/ui/tabs"
 
 export default function Page() {
     const transactions = [

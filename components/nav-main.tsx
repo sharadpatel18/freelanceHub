@@ -11,6 +11,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { redirect } from "next/navigation"
+import NotificationBellComponent from "./notification-bell"
 
 export function NavMain({
   items,
@@ -33,14 +34,8 @@ export function NavMain({
               <PlusCircle />
               <span>Quick Create</span>
             </SidebarMenuButton>
-            <Button
-              size="icon"
-              className="size-8 group-data-[collapsible=icon]:opacity-0"
-              variant="outline"
-            >
-              <Mail />
-              <span className="sr-only">Inbox</span>
-            </Button>
+
+            <NotificationBellComponent />
           </SidebarMenuItem>
         </SidebarMenu>
         <SidebarMenu>

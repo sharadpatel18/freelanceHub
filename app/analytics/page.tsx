@@ -17,20 +17,12 @@ import {
     DollarSign,
     Target,
     Calendar,
-    Clock,
     Star,
-    Award,
     ArrowUpRight,
     ArrowDownRight,
     Download,
     Filter
 } from "lucide-react"
-import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from "@/components/ui/tabs"
 
 export default function Page() {
     const performanceData = [

@@ -1,6 +1,5 @@
 "use client"
 
-import * as React from "react"
 import {
   Briefcase,
   BarChart3,
@@ -9,15 +8,9 @@ import {
   FileText,
   HelpCircle,
   MessageCircle,
-  Search,
   Settings,
-  Star,
-  TrendingUp,
   User,
-  Users,
 } from "lucide-react"
-
-import { NavDocuments } from "@/components/nav-documents"
 import { NavMain } from "@/components/nav-main"
 import { NavSecondary } from "@/components/nav-secondary"
 import { NavUser } from "@/components/nav-user"
@@ -27,11 +20,10 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import Image from "next/image"
 import { redirect } from "next/navigation"
+
 
 const data = {
   user: {
@@ -88,23 +80,6 @@ const data = {
       icon: HelpCircle,
     },
   ],
-  documents: [
-    {
-      name: "Portfolio",
-      url: "/portfolio",
-      icon: Star,
-    },
-    {
-      name: "Reviews",
-      url: "/reviews",
-      icon: TrendingUp,
-    },
-    {
-      name: "Clients",
-      url: "/clients",
-      icon: Users,
-    },
-  ],
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -124,7 +99,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavDocuments items={data.documents} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
