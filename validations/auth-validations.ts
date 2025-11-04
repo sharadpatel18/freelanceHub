@@ -20,5 +20,26 @@ export const profileSchema = z.object({
     .positive("hourly rate must be a positive number")
     .nonoptional("hourly rate is required"),
   isVerified: z.boolean().default(false),
+  website: z.string().optional(),
+  socialLinks: z
+    .object({
+      linkedin: z.string().optional(),
+      github: z.string().optional(),
+      twitter: z.string().optional(),
+      portfolio: z.string().optional(),
+      other: z.string().optional(),
+    })
+    .optional(),
+  certificates: z
+    .array(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        issuer: z.string(),
+        issueDate: z.string(),
+        credentialUrl: z.string(),
+      })
+    )
+    .optional(),
   isEmailVerified: z.boolean().default(false),
 });

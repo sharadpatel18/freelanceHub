@@ -46,7 +46,11 @@ export async function POST(req: NextRequest) {
       profileImage,
       skills,
       languages,
+      website,
+      socialLinks,
+      certificates,
     } = result.data;
+    console.log(result.data);
 
     // Get current user to check their ID
     const currentUser = await db
@@ -92,6 +96,9 @@ export async function POST(req: NextRequest) {
         skills: skills, // Assuming JSON or array field
         languages: languages, // Assuming JSON or array field
         isVerified: true,
+        website: website || null,
+        socialLinks: socialLinks || null,
+        certificates: certificates || null,
         updatedAt: new Date(),
       })
       .where(eq(usersTable.id, userId))

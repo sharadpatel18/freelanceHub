@@ -6,6 +6,7 @@ import {
   timestamp,
   pgEnum,
   boolean,
+  jsonb,
 } from "drizzle-orm/pg-core";
 
 // Define the Role enum
@@ -19,6 +20,7 @@ export const usersTable = pgTable("users", {
   password: text("password").notNull(),
 
   // Profile fields (optional, filled after login)
+  number: text("number"),
   username: text("username").unique(),
   role: roleEnum("role").default("FREELANCER").notNull(),
   profileImage: text("profile_image"),
@@ -31,6 +33,9 @@ export const usersTable = pgTable("users", {
   hourlyRate: real("hourly_rate"), // Use real for decimal numbers
   isVerified: boolean("is_verified").default(false).notNull(),
   isEmailVerified: boolean("is_email_verified").default(false).notNull(),
+  website: text("website"),
+  socialLinks: jsonb("social_links"), // JSON object
+  certificates: jsonb("certificates"), // JSON object
 
   // Timestamps
   createdAt: timestamp("created_at").defaultNow().notNull(),
