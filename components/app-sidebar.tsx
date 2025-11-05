@@ -10,6 +10,7 @@ import {
   MessageCircle,
   Settings,
   User,
+  Workflow,
 } from "lucide-react"
 import { NavMain } from "@/components/nav-main"
 import { NavSecondary } from "@/components/nav-secondary"
@@ -23,6 +24,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { redirect } from "next/navigation"
+import { NavClient } from "./nav-client"
 
 
 const data = {
@@ -80,6 +82,13 @@ const data = {
       icon: HelpCircle,
     },
   ],
+  navClient: [
+    {
+      title: "Your Projects",
+      url: "/my-projects",
+      icon: Workflow
+    },
+  ]
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -99,7 +108,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        <NavClient items={data.navClient} className="mt-auto" />
+        <NavSecondary items={data.navSecondary} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
