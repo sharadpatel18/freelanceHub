@@ -15,6 +15,13 @@
       "when": 1762348404775,
       "tag": "0001_even_otto_octavius",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1762353306820,
+      "tag": "0002_sloppy_crystal",
+      "breakpoints": true
     }
   ]
 }

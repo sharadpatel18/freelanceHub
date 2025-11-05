@@ -4,7 +4,7 @@ import {
   varchar,
   text,
   timestamp,
-  numeric,
+  doublePrecision,
   json,
   pgEnum,
 } from "drizzle-orm/pg-core";
@@ -32,13 +32,15 @@ export const projects = pgTable("projects", {
   subCategory: varchar("sub_category", { length: 100 }),
 
   budgetType: budgetTypeEnum("budget_type").notNull(),
-  minBudget: numeric("min_budget", { precision: 12, scale: 2 }),
-  maxBudget: numeric("max_budget", { precision: 12, scale: 2 }),
+
+  // ✅ store as numbers, not strings
+  minBudget: doublePrecision("min_budget"),
+  maxBudget: doublePrecision("max_budget"),
 
   expectedDuration: varchar("expected_duration", { length: 100 }),
 
-  skills: json("skills").$type<string[]>().default([]), // Array of skills
-  attachments: json("attachments").$type<string[]>().default([]), // file urls
+  skills: json("skills").$type<string[]>().default([]),
+  attachments: json("attachments").$type<string[]>().default([]),
 
   locationPreference: varchar("location_preference", { length: 100 }).default(
     "remote"

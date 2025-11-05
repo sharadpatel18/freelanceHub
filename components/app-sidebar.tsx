@@ -85,7 +85,7 @@ const data = {
   navClient: [
     {
       title: "Your Projects",
-      url: "/my-projects",
+      url: "/client/my-projects",
       icon: Workflow
     },
   ]
