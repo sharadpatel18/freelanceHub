@@ -55,14 +55,13 @@ export default function ProfilePage() {
   const [profileData, setProfileData] = useState(defaultUser)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState("")
-  console.log("userdata: ", profileData);
+
 
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
         setIsLoading(true)
         const res = await getProfile()
-        console.log("USer", res.data.data)
         setProfileData(res.data.data)
       } catch (err) {
         setError("Failed to load profile data")

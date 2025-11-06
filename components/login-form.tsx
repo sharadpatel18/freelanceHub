@@ -26,8 +26,6 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const { data: session } = useSession()
-  console.log(session);
-
   const [formData, setFormData] = useState({
     email: "",
     password: ""

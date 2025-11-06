@@ -8,12 +8,13 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Plus, X, Briefcase, Search, Calendar, DollarSign, MapPin, Clock, Edit, Trash2, Eye } from 'lucide-react';
+import { Plus, X, Briefcase, Search, Calendar, DollarSign, MapPin, Clock, Edit, Trash2, Eye, Loader2 } from 'lucide-react';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
 import { SiteHeader } from '@/components/site-header';
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
+import { createProject, getProjectByUserId, deleteProjectByUserId } from '@/services/projects-services';
 
 const categories = [
     { value: 'web-development', label: 'Web Development' },
@@ -37,149 +38,23 @@ const locationPreferences = [
     { value: 'hybrid', label: 'Hybrid' },
 ];
 
-const mockProjects = [
-    {
-        id: '1',
-        title: 'E-commerce Website Development',
-        description: 'Need a full-stack e-commerce platform with payment integration, product management, and user authentication.',
-        category: 'web-development',
-        budgetType: 'fixed',
-        minBudget: '3000',
-        maxBudget: '5000',
-        expectedDuration: '1-3-months',
-        skills: ['React', 'Node.js', 'MongoDB', 'Stripe'],
-        locationPreference: 'remote',
-        status: 'open',
-        createdAt: '2024-10-15',
-        proposalsCount: 12
-    },
-    {
-        id: '2',
-        title: 'Mobile App UI/UX Design',
-        description: 'Looking for a creative designer to create modern and intuitive UI/UX for our fitness tracking mobile app.',
-        category: 'design',
-        budgetType: 'hourly',
-        minBudget: '40',
-        maxBudget: '60',
-        expectedDuration: 'less-than-1-month',
-        skills: ['Figma', 'UI/UX', 'Mobile Design', 'Prototyping'],
-        locationPreference: 'remote',
-        status: 'in_progress',
-        createdAt: '2024-10-20',
-        proposalsCount: 8
-    },
-    {
-        id: '3',
-        title: 'Content Writing for Tech Blog',
-        description: 'Need experienced tech writers to create SEO-optimized articles about AI, blockchain, and web development.',
-        category: 'writing',
-        budgetType: 'fixed',
-        minBudget: '500',
-        maxBudget: '1000',
-        expectedDuration: '1-3-months',
-        skills: ['Technical Writing', 'SEO', 'Research'],
-        locationPreference: 'remote',
-        status: 'completed',
-        createdAt: '2024-09-10',
-        proposalsCount: 15
-    }
-];
-
-const statusColors = {
+const statusColors: { [key: string]: string } = {
     open: 'bg-green-100 text-green-800 border-green-200',
     in_progress: 'bg-blue-100 text-blue-800 border-blue-200',
     completed: 'bg-gray-100 text-gray-800 ',
     cancelled: 'bg-red-100 text-red-800 border-red-200'
 };
 
-const statusLabels = {
+const statusLabels: { [key: string]: string } = {
     open: 'Open',
     in_progress: 'In Progress',
     completed: 'Completed',
     cancelled: 'Cancelled'
 };
 
-function SkeletonLoader() {
-    return (
-        <SidebarProvider
-            style={
-                {
-                    "--sidebar-width": "calc(var(--spacing) * 72)",
-                    "--header-height": "calc(var(--spacing) * 12)",
-                } as React.CSSProperties
-            }
-        >
-            <AppSidebar variant="inset" />
-            <SidebarInset>
-                <SiteHeader />
-                <div className="min-h-screen bg-background p-6 animate-pulse">
-                    <div className="max-w-7xl mx-auto">
-                        {/* Header Skeleton */}
-                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-                            <div className="flex-1">
-                                <div className="h-9 rounded w-48 mb-2"></div>
-                                <div className="h-5 rounded w-64"></div>
-                            </div>
-                            <div className="h-10 rounded w-40"></div>
-                        </div>
-
-
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                            {[1, 2, 3, 4].map((i) => (
-                                <div key={i} className=" rounded-lg border  p-4">
-                                    <div className="h-8 rounded w-16 mb-2"></div>
-                                    <div className="h-4 rounded w-24"></div>
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* Filters Skeleton */}
-                        <div className="flex flex-col md:flex-row gap-4 mb-6">
-                            <div className="flex-1 h-10  rounded"></div>
-                            <div className="w-full md:w-48 h-10  rounded"></div>
-                        </div>
-
-                        {/* Project Cards Skeleton */}
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            {[1, 2, 3, 4].map((i) => (
-                                <div key={i} className=" rounded-lg border  p-6">
-                                    <div className="flex justify-between items-start mb-3">
-                                        <div className="flex-1">
-                                            <div className="h-6  rounded w-3/4 mb-2"></div>
-                                            <div className="h-6  rounded w-20"></div>
-                                        </div>
-                                        <div className="flex gap-2">
-                                            <div className="h-9 w-9 rounded"></div>
-                                            <div className="h-9 w-9 rounded"></div>
-                                            <div className="h-9 w-9 rounded"></div>
-                                        </div>
-                                    </div>
-                                    <div className="h-4 rounded w-full mb-2"></div>
-                                    <div className="h-4 rounded w-2/3 mb-4"></div>
-                                    <div className="flex flex-wrap gap-2 mb-4">
-                                        {[1, 2, 3].map((j) => (
-                                            <div key={j} className="h-6 rounded w-16"></div>
-                                        ))}
-                                    </div>
-                                    <div className="border-t pt-4">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            {[1, 2, 3, 4].map((j) => (
-                                                <div key={j} className="h-4 rounded"></div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </SidebarInset>
-        </SidebarProvider>
-    );
-}
-
 function ProjectFormDialog({ onProjectCreated }: { onProjectCreated: (project: any) => void }) {
     const [open, setOpen] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -210,39 +85,50 @@ function ProjectFormDialog({ onProjectCreated }: { onProjectCreated: (project: a
         setSkills(skills.filter(skill => skill !== skillToRemove));
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (!formData.title || !formData.description) {
             alert('Please fill in all required fields');
             return;
         }
 
-        const projectData = {
-            id: Date.now().toString(),
-            ...formData,
-            skills,
-            minBudget: formData.minBudget ? parseFloat(formData.minBudget) : null,
-            maxBudget: formData.maxBudget ? parseFloat(formData.maxBudget) : null,
-            status: 'open',
-            createdAt: new Date().toISOString().split('T')[0],
-            proposalsCount: 0
-        };
+        setIsSubmitting(true);
 
-        console.log('Project Data:', projectData);
-        onProjectCreated(projectData);
+        try {
+            const projectData = {
+                ...formData,
+                skills,
+                minBudget: formData.minBudget ? parseFloat(formData.minBudget) : null,
+                maxBudget: formData.maxBudget ? parseFloat(formData.maxBudget) : null,
+                status: 'open',
+                createdAt: new Date().toISOString().split('T')[0],
+                proposalsCount: 0
+            };
 
-        setFormData({
-            title: '',
-            description: '',
-            category: '',
-            subCategory: '',
-            budgetType: 'fixed',
-            minBudget: '',
-            maxBudget: '',
-            expectedDuration: '',
-            locationPreference: 'remote',
-        });
-        setSkills([]);
-        setOpen(false);
+            const res = await createProject(projectData);
+
+            // Pass the created project back to parent
+            onProjectCreated(res);
+
+            // Reset form
+            setFormData({
+                title: '',
+                description: '',
+                category: '',
+                subCategory: '',
+                budgetType: 'fixed',
+                minBudget: '',
+                maxBudget: '',
+                expectedDuration: '',
+                locationPreference: 'remote',
+            });
+            setSkills([]);
+            setOpen(false);
+        } catch (error) {
+            console.error('Error creating project:', error);
+            alert('Failed to create project. Please try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -461,6 +347,7 @@ function ProjectFormDialog({ onProjectCreated }: { onProjectCreated: (project: a
                             type="button"
                             variant="outline"
                             onClick={() => setOpen(false)}
+                            disabled={isSubmitting}
                         >
                             Cancel
                         </Button>
@@ -468,8 +355,16 @@ function ProjectFormDialog({ onProjectCreated }: { onProjectCreated: (project: a
                             type="button"
                             onClick={handleSubmit}
                             className="bg-blue-600 hover:bg-blue-700"
+                            disabled={isSubmitting}
                         >
-                            Post Project
+                            {isSubmitting ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                    Creating...
+                                </>
+                            ) : (
+                                'Post Project'
+                            )}
                         </Button>
                     </div>
                 </div>
@@ -480,10 +375,10 @@ function ProjectFormDialog({ onProjectCreated }: { onProjectCreated: (project: a
 
 function ProjectCard({ project, onDelete }: { project: any, onDelete: (projectId: string) => void }) {
     return (
-        <div className=" rounded-lg border  p-6 hover:shadow-lg transition-shadow">
+        <div className="rounded-lg border p-6 hover:shadow-lg transition-shadow">
             <div className="flex justify-between items-start mb-3">
                 <div className="flex-1">
-                    <h3 className="text-xl font-semibold  mb-2">{project.title}</h3>
+                    <h3 className="text-xl font-semibold mb-2">{project.title}</h3>
                     <Badge className={`${statusColors[project.status]} border`}>
                         {statusLabels[project.status]}
                     </Badge>
@@ -492,7 +387,7 @@ function ProjectCard({ project, onDelete }: { project: any, onDelete: (projectId
                     <Button variant="ghost" size="icon" className="text-blue-600 hover:text-blue-700">
                         <Eye className="w-4 h-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" className=" hover:text-gray-700">
+                    <Button variant="ghost" size="icon" className="hover:text-gray-700">
                         <Edit className="w-4 h-4" />
                     </Button>
                     <Button
@@ -506,22 +401,22 @@ function ProjectCard({ project, onDelete }: { project: any, onDelete: (projectId
                 </div>
             </div>
 
-            <p className=" mb-4 line-clamp-2">{project.description}</p>
+            <p className="mb-4 line-clamp-2">{project.description}</p>
 
             <div className="flex flex-wrap gap-2 mb-4">
-                {project.skills.slice(0, 4).map((skill: string) => (
+                {project.skills?.slice(0, 4).map((skill: string) => (
                     <Badge key={skill} variant="outline" className="text-xs">
                         {skill}
                     </Badge>
                 ))}
-                {project.skills.length > 4 && (
+                {project.skills?.length > 4 && (
                     <Badge variant="outline" className="text-xs">
                         +{project.skills.length - 4} more
                     </Badge>
                 )}
             </div>
 
-            <div className="grid grid-cols-2 gap-4 text-sm  border-t pt-4">
+            <div className="grid grid-cols-2 gap-4 text-sm border-t pt-4">
                 <div className="flex items-center gap-2">
                     <DollarSign className="w-4 h-4" />
                     <span>
@@ -539,7 +434,7 @@ function ProjectCard({ project, onDelete }: { project: any, onDelete: (projectId
                 </div>
                 <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4" />
-                    <span className="font-medium text-blue-600">{project.proposalsCount} proposals</span>
+                    <span className="font-medium text-blue-600">{project.proposalsCount || 0} proposals</span>
                 </div>
             </div>
         </div>
@@ -547,37 +442,66 @@ function ProjectCard({ project, onDelete }: { project: any, onDelete: (projectId
 }
 
 export default function ClientProjectsPage() {
-    // Simulate session loading
+    const [isMounted, setIsMounted] = useState(false);
     const [isSessionLoading, setIsSessionLoading] = useState(true);
     const { data: session } = useSession();
-    // Simulate session data fetching
+
+    // State for projects and UI
+    const [projects, setProjects] = useState<any[]>([]);
+    const [isLoadingProjects, setIsLoadingProjects] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [filterStatus, setFilterStatus] = useState('all');
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
     useEffect(() => {
         const timer = setTimeout(() => {
-            ;
             setIsSessionLoading(false);
-        }, 2000); // Simulates 2 second delay
+        }, 2000);
 
         return () => clearTimeout(timer);
     }, []);
 
-    const [projects, setProjects] = useState(mockProjects);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [filterStatus, setFilterStatus] = useState('all');
+    // TODO: Fetch projects from API
+    // Uncomment and implement when your GET projects API is ready
+    useEffect(() => {
+        const fetchProjects = async () => {
+            if (!session) return;
+
+            setIsLoadingProjects(true);
+            try {
+                const data = await getProjectByUserId(); // Replace with your API endpoint
+                setProjects(data.data);
+            } catch (error) {
+                console.error('Error fetching projects:', error);
+            } finally {
+                setIsLoadingProjects(false);
+            }
+        };
+
+        if (!isSessionLoading && session) {
+            fetchProjects();
+        }
+    }, [session, isSessionLoading]);
 
     const handleProjectCreated = (newProject: any) => {
         setProjects([newProject, ...projects]);
         alert('Project created successfully!');
     };
 
-    const handleDeleteProject = (projectId: string) => {
+    const handleDeleteProject = async (projectId: string) => {
         if (confirm('Are you sure you want to delete this project?')) {
+            await deleteProjectByUserId(projectId);
             setProjects(projects.filter(p => p.id !== projectId));
         }
     };
 
     const filteredProjects = projects.filter(project => {
-        const matchesSearch = project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            project.description.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesSearch =
+            (project.title?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+            (project.description?.toLowerCase() || '').includes(searchQuery.toLowerCase());
         const matchesStatus = filterStatus === 'all' || project.status === filterStatus;
         return matchesSearch && matchesStatus;
     });
@@ -589,15 +513,14 @@ export default function ClientProjectsPage() {
         completed: projects.filter(p => p.status === 'completed').length,
     };
 
-    // Show skeleton loader while session is loading
-    if (isSessionLoading) {
-        return <SkeletonLoader />;
+    if (!isSessionLoading && session?.user.role !== "CLIENT") {
+        return redirect("/home");
     }
 
-    if (!isSessionLoading && session?.user.role !== "CLIENT") {
-        return redirect("/home")
+    if (!isMounted) {
+        return null;
     }
-    // Show main content when session is loaded
+
     return (
         <SidebarProvider
             style={
@@ -608,34 +531,34 @@ export default function ClientProjectsPage() {
             }
         >
             <AppSidebar variant="inset" />
-            <SidebarInset >
+            <SidebarInset>
                 <SiteHeader />
                 <div className="min-h-screen p-6">
                     <div className="max-w-7xl mx-auto">
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                             <div>
-                                <h1 className="text-3xl font-bol mb-2">My Projects</h1>
+                                <h1 className="text-3xl font-bold mb-2">My Projects</h1>
                                 <p>Manage and track all your posted projects</p>
                             </div>
                             <ProjectFormDialog onProjectCreated={handleProjectCreated} />
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                            <div className=" rounded-lg border  p-4">
-                                <div className="text-2xl font-bold ">{stats.total}</div>
-                                <div className="text-sm ">Total Projects</div>
+                            <div className="rounded-lg border p-4">
+                                <div className="text-2xl font-bold">{stats.total}</div>
+                                <div className="text-sm">Total Projects</div>
                             </div>
-                            <div className=" rounded-lg border border-green-200 p-4">
+                            <div className="rounded-lg border border-green-200 p-4">
                                 <div className="text-2xl font-bold text-green-600">{stats.open}</div>
-                                <div className="text-sm ">Open</div>
+                                <div className="text-sm">Open</div>
                             </div>
-                            <div className=" rounded-lg border border-blue-200 p-4">
+                            <div className="rounded-lg border border-blue-200 p-4">
                                 <div className="text-2xl font-bold text-blue-600">{stats.inProgress}</div>
-                                <div className="text-sm ">In Progress</div>
+                                <div className="text-sm">In Progress</div>
                             </div>
-                            <div className=" rounded-lg border  p-4">
-                                <div className="text-2xl font-bold ">{stats.completed}</div>
-                                <div className="text-sm ">Completed</div>
+                            <div className="rounded-lg border p-4">
+                                <div className="text-2xl font-bold">{stats.completed}</div>
+                                <div className="text-sm">Completed</div>
                             </div>
                         </div>
 
@@ -663,7 +586,12 @@ export default function ClientProjectsPage() {
                             </Select>
                         </div>
 
-                        {filteredProjects.length > 0 ? (
+                        {isLoadingProjects ? (
+                            <div className="flex justify-center items-center py-12">
+                                <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+                                <span className="ml-2">Loading projects...</span>
+                            </div>
+                        ) : filteredProjects.length > 0 ? (
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                 {filteredProjects.map((project) => (
                                     <ProjectCard
@@ -674,10 +602,10 @@ export default function ClientProjectsPage() {
                                 ))}
                             </div>
                         ) : (
-                            <div className=" rounded-lg border  p-12 text-center">
+                            <div className="rounded-lg border p-12 text-center">
                                 <Briefcase className="w-16 h-16 mx-auto mb-4" />
-                                <h3 className="text-xl font-semibold  mb-2">No projects found</h3>
-                                <p className=" mb-6">
+                                <h3 className="text-xl font-semibold mb-2">No projects found</h3>
+                                <p className="mb-6">
                                     {searchQuery || filterStatus !== 'all'
                                         ? 'Try adjusting your filters'
                                         : 'Get started by posting your first project'}

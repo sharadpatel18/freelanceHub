@@ -160,7 +160,6 @@ export default function CompleteProfilePage() {
             imageFormData.append('file', selectedFile);
 
             const res = await uploadUserImage(imageFormData);
-            console.log(res);
             setIsImageUploadedSuccessfully(true);
             setFormData({ ...formData, profileImage: res.data.url });
             setImageUploaded(true);
@@ -206,10 +205,7 @@ export default function CompleteProfilePage() {
                 socialLinks,
                 certificates,
             };
-            console.log("Profile data:", profileData);
             const res = await completeProfile(profileData);
-            console.log("Response:", res)
-            console.log("Profile updated successfully!");
         } catch (error) {
             console.error("Error updating profile:", error);
         } finally {

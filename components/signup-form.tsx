@@ -134,7 +134,6 @@ export function SignupForm() {
 
         setIsSubmitting(true);
         const res = await createUser(formData);
-        console.log(res);
 
         if (res.status === 201) {
             toast.success("Account created successfully!");

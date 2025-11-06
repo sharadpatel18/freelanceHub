@@ -77,7 +77,6 @@ export default function ProjectFormDialog() {
             maxBudget: formData.maxBudget ? parseFloat(formData.maxBudget) : null,
         };
 
-        console.log('Project Data:', projectData);
         alert('Project created successfully! Check console for data.');
 
         // Reset data

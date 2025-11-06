@@ -23,7 +23,6 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     // Validate required fields
     const result = profileSchema.safeParse(body);
-    console.log(body);
 
     if (!result.success) {
       return NextResponse.json(
@@ -50,7 +49,6 @@ export async function POST(req: NextRequest) {
       socialLinks,
       certificates,
     } = result.data;
-    console.log(result.data);
 
     // Get current user to check their ID
     const currentUser = await db
