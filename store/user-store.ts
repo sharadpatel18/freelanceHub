@@ -1,13 +1,12 @@
 // stores/useAuthStore.ts
+import { userType } from "@/types/auth-types";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
 interface User {
-  id: string;
-  name: string;
-  email: string;
-  image?: string;
-  role?: string;
+  success: boolean;
+  message: string;
+  data: userType;
 }
 
 interface AuthState {
@@ -21,7 +20,6 @@ interface AuthState {
   setToken: (token: string | null) => void;
   setSession: (user: User, token: string) => void;
   clearSession: () => void;
-  syncWithNextAuth: () => Promise<void>;
   getUserFromLocalStorage: () => User | null;
   getTokenFromLocalStorage: () => string | null;
   initializeFromLocalStorage: () => void;
@@ -29,7 +27,7 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       user: null,
       token: null,
       isAuthenticated: false,
@@ -56,34 +54,6 @@ export const useAuthStore = create<AuthState>()(
           token: null,
           isAuthenticated: false,
         }),
-
-      // Sync with NextAuth session
-      syncWithNextAuth: async () => {
-        set({ isLoading: true });
-        try {
-          const response = await fetch("/api/auth/session");
-          const session = await response.json();
-
-          if (session?.user) {
-            set({
-              user: session.user,
-              token: session.accessToken || null,
-              isAuthenticated: true,
-              isLoading: false,
-            });
-          } else {
-            set({
-              user: null,
-              token: null,
-              isAuthenticated: false,
-              isLoading: false,
-            });
-          }
-        } catch (error) {
-          console.error("Failed to sync with NextAuth session:", error);
-          set({ isLoading: false });
-        }
-      },
 
       // Get user directly from localStorage (synchronous)
       getUserFromLocalStorage: (): User | null => {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,17 +14,16 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/app-sidebar";
-import { SiteHeader } from "@/components/site-header";
 import { X, User, Briefcase, MapPin, DollarSign, Loader2, Upload, Image as ImageIcon, Check, Globe, Linkedin, Twitter, Github, LinkIcon, Award, Plus } from "lucide-react";
 import { toast } from "sonner";
-import { useSession } from "next-auth/react";
 import { completeProfile, uploadUserImage } from "@/services/auth-services";
 import { useAuthStore } from "@/store/user-store";
+import { redirect } from "next/navigation";
 
 export default function CompleteProfilePage() {
-    const { setUser, isAuthenticated } = useAuthStore();
+    const { setUser, getUserFromLocalStorage } = useAuthStore();
+    const user = getUserFromLocalStorage();
+    const [isMounted, setIsMounted] = useState(false);
     const [loading, setLoading] = useState(false);
     const [uploadingImage, setUploadingImage] = useState(false);
     const [imageUploaded, setImageUploaded] = useState(false);
@@ -71,6 +70,18 @@ export default function CompleteProfilePage() {
         issueDate: "",
         credentialUrl: "",
     });
+
+    useEffect(() => {
+        if (user && user?.data.isVerified) {
+            return redirect("/home");
+        }
+    }, [user]);
+
+    useEffect(() => {
+        if (!isMounted) {
+            setIsMounted(true);
+        }
+    }, [isMounted])
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -222,6 +233,10 @@ export default function CompleteProfilePage() {
             setLoading(false);
         }
     };
+
+    if (!isMounted) {
+        return null;
+    }
 
     return (
         <div className="min-h-screen bg-background">

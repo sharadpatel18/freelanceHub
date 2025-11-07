@@ -50,7 +50,7 @@ export function LoginForm({
       toast.error("Login failed!")
     }
 
-    if (session?.user.isVerified) {
+    if (res?.ok && session?.user) {
       redirect("/home")
     } else {
       redirect("/profile/form")

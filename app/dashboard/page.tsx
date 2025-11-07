@@ -1,3 +1,5 @@
+"use client"
+
 import { AppSidebar } from "@/components/app-sidebar"
 import { SiteHeader } from "@/components/site-header"
 import {
@@ -25,8 +27,12 @@ import {
   Eye,
   CheckCircle,
 } from "lucide-react"
+import { useAuthStore } from "@/store/user-store"
+import { useState } from "react"
 
 export default function Page() {
+  const { getUserFromLocalStorage } = useAuthStore();
+  const [user, setUser] = useState(getUserFromLocalStorage());
   return (
     <SidebarProvider
       style={
@@ -51,7 +57,7 @@ export default function Page() {
               <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8">
                 <div>
                   <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
-                    Welcome back, John! 👋
+                    Welcome back, {user?.data?.name} 👋
                   </h1>
                   <p className="text-muted-foreground">
                     Here's what's happening with your freelance business today.

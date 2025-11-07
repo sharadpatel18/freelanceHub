@@ -25,6 +25,8 @@ import {
 } from "@/components/ui/sidebar"
 import { redirect } from "next/navigation"
 import { NavClient } from "./nav-client"
+import { useAuthStore } from "@/store/user-store"
+import { useEffect, useState } from "react"
 
 
 const data = {
@@ -84,7 +86,7 @@ const data = {
   ],
   navClient: [
     {
-      title: "Your Projects",
+      title: "My Projects",
       url: "/client/my-projects",
       icon: Workflow
     },
@@ -92,6 +94,18 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { getUserFromLocalStorage } = useAuthStore();
+  const [isMounted, setIsMounted] = useState(false);
+  const user = getUserFromLocalStorage();
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return null;
+  }
+  if (!user) return null
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -108,8 +122,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavClient items={data.navClient} className="mt-auto" />
-        <NavSecondary items={data.navSecondary} />
+        {
+          user.data.role === "CLIENT" &&
+          <NavClient items={data.navClient} className="mt-auto" />
+        }
+        <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
