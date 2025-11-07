@@ -40,7 +40,7 @@ const data = {
       icon: LayoutDashboard,
     },
     {
-      title: "My Projects",
+      title: "Projects",
       url: "/projects",
       icon: Briefcase,
     },

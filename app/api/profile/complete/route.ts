@@ -113,12 +113,7 @@ export async function POST(req: NextRequest) {
       {
         success: true,
         message: "Profile completed successfully",
-        data: {
-          id: updatedUser[0].id,
-          username: updatedUser[0].username,
-          email: updatedUser[0].email,
-          isVerified: updatedUser[0].isVerified,
-        },
+        data: updatedUser[0],
       },
       { status: 200 }
     );

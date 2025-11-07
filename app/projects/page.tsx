@@ -1,3 +1,5 @@
+"use client"
+
 import { AppSidebar } from "@/components/app-sidebar"
 import { SiteHeader } from "@/components/site-header"
 import {
@@ -8,118 +10,54 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Progress } from "@/components/ui/progress"
 import {
-    Briefcase,
     Search,
     Filter,
     Plus,
     Calendar,
     DollarSign,
-    Clock,
-    CheckCircle,
-    FileText,
     Users,
-    TrendingUp,
     MoreVertical,
     Eye,
     Edit,
-    Trash2
+    Trash2,
+    Folder,
+    MapPin,
+    Clock,
+    Paperclip,
+    RefreshCw
 } from "lucide-react"
+import { ProjectType } from "@/types/projects"
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from "@/components/ui/tabs"
+import { useEffect, useState } from "react"
+import { toast } from "sonner"
+import { getAllProjects } from "@/services/projects-services"
 
 export default function Page() {
-    const projects = [
-        {
-            id: 1,
-            title: "E-commerce Website Redesign",
-            client: "TechCorp Inc.",
-            status: "in-progress",
-            progress: 65,
-            budget: 3200,
-            spent: 2080,
-            deadline: "Dec 15, 2025",
-            daysLeft: 40,
-            description: "Complete redesign of the e-commerce platform with modern UI/UX",
-            tags: ["Web Design", "UI/UX", "React"]
-        },
-        {
-            id: 2,
-            title: "Mobile App UI/UX Design",
-            client: "StartupXYZ",
-            status: "review",
-            progress: 90,
-            budget: 2800,
-            spent: 2520,
-            deadline: "Nov 20, 2025",
-            daysLeft: 15,
-            description: "Design mobile application interface for iOS and Android",
-            tags: ["Mobile", "UI/UX", "Figma"]
-        },
-        {
-            id: 3,
-            title: "Brand Identity Package",
-            client: "CreativeStudio",
-            status: "completed",
-            progress: 100,
-            budget: 1500,
-            spent: 1500,
-            deadline: "Oct 30, 2025",
-            daysLeft: 0,
-            description: "Complete brand identity including logo, colors, and guidelines",
-            tags: ["Branding", "Design", "Illustrator"]
-        },
-        {
-            id: 4,
-            title: "Marketing Website Development",
-            client: "Digital Agency Co.",
-            status: "in-progress",
-            progress: 45,
-            budget: 4500,
-            spent: 2025,
-            deadline: "Jan 10, 2026",
-            daysLeft: 66,
-            description: "Build responsive marketing website with CMS integration",
-            tags: ["Web Dev", "Next.js", "CMS"]
-        },
-        {
-            id: 5,
-            title: "Dashboard Analytics Tool",
-            client: "DataTech Solutions",
-            status: "planning",
-            progress: 15,
-            budget: 5200,
-            spent: 780,
-            deadline: "Feb 28, 2026",
-            daysLeft: 115,
-            description: "Create analytics dashboard with data visualization",
-            tags: ["Dashboard", "React", "D3.js"]
-        },
-        {
-            id: 6,
-            title: "Logo Design & Branding",
-            client: "FreshStart Inc.",
-            status: "completed",
-            progress: 100,
-            budget: 800,
-            spent: 800,
-            deadline: "Oct 15, 2025",
-            daysLeft: 0,
-            description: "Design modern logo and brand guidelines",
-            tags: ["Logo", "Branding"]
+    const [isMounted, setIsMounted] = useState(false)
+    useEffect(() => {
+        setIsMounted(true)
+    }, [])
+    const [projects, setProjects] = useState<ProjectType[]>([])
+    useEffect(() => {
+        const fetchProjects = async () => {
+            try {
+                const data = await getAllProjects();
+                setProjects(data.data);
+                console.log(data.data);
+
+            } catch (error) {
+                console.error(error)
+                toast.error("Something went wrong")
+            }
         }
-    ]
+        fetchProjects();
+    }, [])
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -134,12 +72,9 @@ export default function Page() {
     const getStatusText = (status: string) => {
         return status.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
     }
-
-    const filterProjects = (status: string) => {
-        if (status === 'all') return projects
-        return projects.filter(p => p.status === status)
+    if (!isMounted) {
+        return null
     }
-
     return (
         <SidebarProvider
             style={
@@ -163,7 +98,7 @@ export default function Page() {
                             <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6">
                                 <div>
                                     <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
-                                        My Projects
+                                        Projects
                                     </h1>
                                     <p className="text-muted-foreground">
                                         Manage and track all your freelance projects in one place
@@ -192,197 +127,131 @@ export default function Page() {
                         </div>
                     </section>
 
-                    {/* Stats Overview */}
                     <section className="px-6 pb-8">
                         <div className="container mx-auto">
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                                <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-2 hover:border-primary/20">
-                                    <CardContent className="pt-6">
-                                        <div className="flex items-center justify-between">
-                                            <div>
-                                                <p className="text-sm font-medium text-muted-foreground">Total Projects</p>
-                                                <p className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">12</p>
-                                                <p className="text-sm text-muted-foreground mt-1">All time</p>
+                            {projects.length > 0 && projects.map((project: ProjectType) => (
+                                <Card key={project.id} className="group mb-8 hover:shadow-xl transition-all duration-300 border-2 hover:border-primary/20">
+                                    <CardHeader>
+                                        <div className="flex items-start justify-between">
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-3 mb-2">
+                                                    <CardTitle className="text-xl">{project.title}</CardTitle>
+                                                    <Badge variant="secondary" className={getStatusColor(project.status)}>
+                                                        {getStatusText(project.status)}
+                                                    </Badge>
+                                                </div>
+                                                <CardDescription className="flex items-center gap-4 flex-wrap">
+                                                    <span className="flex items-center gap-1">
+                                                        <Users className="h-4 w-4" />
+                                                        Client: {project.user.name}
+                                                    </span>
+                                                    <span className="flex items-center gap-1">
+                                                        <Calendar className="h-4 w-4" />
+                                                        Duration: {project.expectedDuration} days
+                                                    </span>
+                                                    <span className="flex items-center gap-1">
+                                                        <Folder className="h-4 w-4" />
+                                                        {project.category} / {project.subCategory}
+                                                    </span>
+                                                    <span className="flex items-center gap-1">
+                                                        <MapPin className="h-4 w-4" />
+                                                        {project.locationPreference}
+                                                    </span>
+                                                </CardDescription>
                                             </div>
-                                            <div className="p-3 bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg group-hover:scale-110 transition-transform duration-300">
-                                                <Briefcase className="h-6 w-6 text-primary" />
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" size="sm">
+                                                        <MoreVertical className="h-4 w-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end">
+                                                    <DropdownMenuItem>
+                                                        <Eye className="h-4 w-4 mr-2" />
+                                                        View Details
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem>
+                                                        <Edit className="h-4 w-4 mr-2" />
+                                                        Edit Project
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem className="text-red-600">
+                                                        <Trash2 className="h-4 w-4 mr-2" />
+                                                        Delete
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </div>
+                                    </CardHeader>
+
+                                    <CardContent>
+                                        <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
+                                            {project.description}
+                                        </p>
+
+                                        {project.skills && project.skills.length > 0 && (
+                                            <div className="flex flex-wrap gap-2 mb-4">
+                                                {project.skills.map((skill) => (
+                                                    <Badge key={skill} variant="outline" className="bg-primary/5">
+                                                        {skill}
+                                                    </Badge>
+                                                ))}
                                             </div>
+                                        )}
+
+                                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t">
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 bg-gradient-to-br from-green-500/20 to-green-500/10 rounded-lg">
+                                                    <DollarSign className="h-4 w-4 text-green-500" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-xs text-muted-foreground">Budget Range</p>
+                                                    <p className="text-sm font-semibold">
+                                                        ${project.minBudget.toLocaleString()} - ${project.maxBudget.toLocaleString()}
+                                                    </p>
+                                                    <p className="text-xs text-muted-foreground capitalize">{project.budgetType}</p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 bg-gradient-to-br from-blue-500/20 to-blue-500/10 rounded-lg">
+                                                    <Clock className="h-4 w-4 text-blue-500" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-xs text-muted-foreground">Duration</p>
+                                                    <p className="text-sm font-semibold">{project.expectedDuration} days</p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 bg-gradient-to-br from-orange-500/20 to-orange-500/10 rounded-lg">
+                                                    <Paperclip className="h-4 w-4 text-orange-500" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-xs text-muted-foreground">Attachments</p>
+                                                    <p className="text-sm font-semibold">{project.attachments?.length || 0} files</p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 bg-gradient-to-br from-purple-500/20 to-purple-500/10 rounded-lg">
+                                                    <RefreshCw className="h-4 w-4 text-purple-500" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-xs text-muted-foreground">Last Updated</p>
+                                                    <p className="text-sm font-semibold">
+                                                        {new Date(project.updatedAt).toLocaleDateString()}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex justify-between items-center mt-4 pt-4 border-t text-xs text-muted-foreground">
+                                            <span>Created: {new Date(project.createdAt).toLocaleDateString()}</span>
+                                            <span>Updated: {new Date(project.updatedAt).toLocaleDateString()}</span>
                                         </div>
                                     </CardContent>
                                 </Card>
-
-                                <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-2 hover:border-primary/20">
-                                    <CardContent className="pt-6">
-                                        <div className="flex items-center justify-between">
-                                            <div>
-                                                <p className="text-sm font-medium text-muted-foreground">Active</p>
-                                                <p className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-blue-600 bg-clip-text text-transparent">8</p>
-                                                <p className="text-sm text-muted-foreground mt-1">In progress</p>
-                                            </div>
-                                            <div className="p-3 bg-gradient-to-br from-blue-500/20 to-blue-500/10 rounded-lg group-hover:scale-110 transition-transform duration-300">
-                                                <TrendingUp className="h-6 w-6 text-blue-500" />
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-
-                                <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-2 hover:border-primary/20">
-                                    <CardContent className="pt-6">
-                                        <div className="flex items-center justify-between">
-                                            <div>
-                                                <p className="text-sm font-medium text-muted-foreground">Completed</p>
-                                                <p className="text-2xl font-bold bg-gradient-to-r from-green-500 to-green-600 bg-clip-text text-transparent">4</p>
-                                                <p className="text-sm text-muted-foreground mt-1">This month</p>
-                                            </div>
-                                            <div className="p-3 bg-gradient-to-br from-green-500/20 to-green-500/10 rounded-lg group-hover:scale-110 transition-transform duration-300">
-                                                <CheckCircle className="h-6 w-6 text-green-500" />
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-
-                                <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-2 hover:border-primary/20">
-                                    <CardContent className="pt-6">
-                                        <div className="flex items-center justify-between">
-                                            <div>
-                                                <p className="text-sm font-medium text-muted-foreground">Revenue</p>
-                                                <p className="text-2xl font-bold bg-gradient-to-r from-green-500 to-green-600 bg-clip-text text-transparent">$18k</p>
-                                                <p className="text-sm text-muted-foreground mt-1">Total value</p>
-                                            </div>
-                                            <div className="p-3 bg-gradient-to-br from-green-500/20 to-green-500/10 rounded-lg group-hover:scale-110 transition-transform duration-300">
-                                                <DollarSign className="h-6 w-6 text-green-500" />
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            </div>
-                        </div>
-                    </section>
-
-                    {/* Projects List with Tabs */}
-                    <section className="px-6 pb-8">
-                        <div className="container mx-auto">
-                            <Tabs defaultValue="all" className="w-full">
-                                <TabsList className="grid w-full max-w-2xl grid-cols-5 mb-6">
-                                    <TabsTrigger value="all">All</TabsTrigger>
-                                    <TabsTrigger value="in-progress">In Progress</TabsTrigger>
-                                    <TabsTrigger value="review">Review</TabsTrigger>
-                                    <TabsTrigger value="completed">Completed</TabsTrigger>
-                                    <TabsTrigger value="planning">Planning</TabsTrigger>
-                                </TabsList>
-
-                                {['all', 'in-progress', 'review', 'completed', 'planning'].map((tab) => (
-                                    <TabsContent key={tab} value={tab} className="space-y-6">
-                                        {filterProjects(tab).map((project) => (
-                                            <Card key={project.id} className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-primary/20">
-                                                <CardHeader>
-                                                    <div className="flex items-start justify-between">
-                                                        <div className="flex-1">
-                                                            <div className="flex items-center gap-3 mb-2">
-                                                                <CardTitle className="text-xl">{project.title}</CardTitle>
-                                                                <Badge variant="secondary" className={getStatusColor(project.status)}>
-                                                                    {getStatusText(project.status)}
-                                                                </Badge>
-                                                            </div>
-                                                            <CardDescription className="flex items-center gap-4">
-                                                                <span className="flex items-center gap-1">
-                                                                    <Users className="h-4 w-4" />
-                                                                    {project.client}
-                                                                </span>
-                                                                <span className="flex items-center gap-1">
-                                                                    <Calendar className="h-4 w-4" />
-                                                                    Due: {project.deadline}
-                                                                </span>
-                                                                {project.daysLeft > 0 && (
-                                                                    <span className="flex items-center gap-1 text-yellow-600">
-                                                                        <Clock className="h-4 w-4" />
-                                                                        {project.daysLeft} days left
-                                                                    </span>
-                                                                )}
-                                                            </CardDescription>
-                                                        </div>
-                                                        <DropdownMenu>
-                                                            <DropdownMenuTrigger asChild>
-                                                                <Button variant="ghost" size="sm">
-                                                                    <MoreVertical className="h-4 w-4" />
-                                                                </Button>
-                                                            </DropdownMenuTrigger>
-                                                            <DropdownMenuContent align="end">
-                                                                <DropdownMenuItem>
-                                                                    <Eye className="h-4 w-4 mr-2" />
-                                                                    View Details
-                                                                </DropdownMenuItem>
-                                                                <DropdownMenuItem>
-                                                                    <Edit className="h-4 w-4 mr-2" />
-                                                                    Edit Project
-                                                                </DropdownMenuItem>
-                                                                <DropdownMenuItem className="text-red-600">
-                                                                    <Trash2 className="h-4 w-4 mr-2" />
-                                                                    Delete
-                                                                </DropdownMenuItem>
-                                                            </DropdownMenuContent>
-                                                        </DropdownMenu>
-                                                    </div>
-                                                </CardHeader>
-                                                <CardContent>
-                                                    <p className="text-sm text-muted-foreground mb-4">{project.description}</p>
-
-                                                    {/* Tags */}
-                                                    <div className="flex flex-wrap gap-2 mb-4">
-                                                        {project.tags.map((tag) => (
-                                                            <Badge key={tag} variant="outline" className="bg-primary/5">
-                                                                {tag}
-                                                            </Badge>
-                                                        ))}
-                                                    </div>
-
-                                                    {/* Progress Section */}
-                                                    <div className="space-y-4">
-                                                        <div>
-                                                            <div className="flex items-center justify-between mb-2">
-                                                                <span className="text-sm font-medium">Progress</span>
-                                                                <span className="text-sm text-muted-foreground">{project.progress}%</span>
-                                                            </div>
-                                                            <Progress value={project.progress} className="h-2" />
-                                                        </div>
-
-                                                        {/* Budget Info */}
-                                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t">
-                                                            <div className="flex items-center gap-3">
-                                                                <div className="p-2 bg-gradient-to-br from-green-500/20 to-green-500/10 rounded-lg">
-                                                                    <DollarSign className="h-4 w-4 text-green-500" />
-                                                                </div>
-                                                                <div>
-                                                                    <p className="text-xs text-muted-foreground">Budget</p>
-                                                                    <p className="text-sm font-semibold">${project.budget.toLocaleString()}</p>
-                                                                </div>
-                                                            </div>
-                                                            <div className="flex items-center gap-3">
-                                                                <div className="p-2 bg-gradient-to-br from-blue-500/20 to-blue-500/10 rounded-lg">
-                                                                    <TrendingUp className="h-4 w-4 text-blue-500" />
-                                                                </div>
-                                                                <div>
-                                                                    <p className="text-xs text-muted-foreground">Spent</p>
-                                                                    <p className="text-sm font-semibold">${project.spent.toLocaleString()}</p>
-                                                                </div>
-                                                            </div>
-                                                            <div className="flex items-center gap-3">
-                                                                <div className="p-2 bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg">
-                                                                    <FileText className="h-4 w-4 text-primary" />
-                                                                </div>
-                                                                <div>
-                                                                    <p className="text-xs text-muted-foreground">Remaining</p>
-                                                                    <p className="text-sm font-semibold">${(project.budget - project.spent).toLocaleString()}</p>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </CardContent>
-                                            </Card>
-                                        ))}
-                                    </TabsContent>
-                                ))}
-                            </Tabs>
+                            ))}
                         </div>
                     </section>
                 </div>

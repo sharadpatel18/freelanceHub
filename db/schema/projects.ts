@@ -45,7 +45,6 @@ export const projects = pgTable("projects", {
   locationPreference: varchar("location_preference", { length: 100 }).default(
     "remote"
   ),
-
   status: projectStatusEnum("status").default("open").notNull(),
 
   createdAt: timestamp("created_at").defaultNow().notNull(),

@@ -21,9 +21,10 @@ import { X, User, Briefcase, MapPin, DollarSign, Loader2, Upload, Image as Image
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 import { completeProfile, uploadUserImage } from "@/services/auth-services";
+import { useAuthStore } from "@/store/user-store";
 
 export default function CompleteProfilePage() {
-    const { data: session, status } = useSession();
+    const { setUser, isAuthenticated } = useAuthStore();
     const [loading, setLoading] = useState(false);
     const [uploadingImage, setUploadingImage] = useState(false);
     const [imageUploaded, setImageUploaded] = useState(false);
@@ -206,6 +207,15 @@ export default function CompleteProfilePage() {
                 certificates,
             };
             const res = await completeProfile(profileData);
+            if (res.status === 200) {
+                console.log(res.data);
+
+                setUser(res.data);
+                toast.success("Profile updated successfully!");
+            } else {
+                toast.error("Failed to update profile");
+            }
+
         } catch (error) {
             console.error("Error updating profile:", error);
         } finally {

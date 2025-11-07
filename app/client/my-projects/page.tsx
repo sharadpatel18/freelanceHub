@@ -15,6 +15,8 @@ import { SiteHeader } from '@/components/site-header';
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
 import { createProject, getProjectByUserId, deleteProjectByUserId } from '@/services/projects-services';
+import { useAuthStore } from '@/store/user-store';
+import { ProjectType } from '@/types/projects';
 
 const categories = [
     { value: 'web-development', label: 'Web Development' },
@@ -445,25 +447,23 @@ export default function ClientProjectsPage() {
     const [isMounted, setIsMounted] = useState(false);
     const [isSessionLoading, setIsSessionLoading] = useState(true);
     const { data: session } = useSession();
-
+    const { getUserFromLocalStorage } = useAuthStore();
     // State for projects and UI
-    const [projects, setProjects] = useState<any[]>([]);
+    const [projects, setProjects] = useState<ProjectType[]>([]);
     const [isLoadingProjects, setIsLoadingProjects] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');
+    const [userData, setUserData] = useState(getUserFromLocalStorage() || null)
 
     useEffect(() => {
         setIsMounted(true);
     }, []);
 
     useEffect(() => {
-        const timer = setTimeout(() => {
+        if (userData) {
             setIsSessionLoading(false);
-        }, 2000);
-
-        return () => clearTimeout(timer);
-    }, []);
-
+        }
+    }, [userData])
     // TODO: Fetch projects from API
     // Uncomment and implement when your GET projects API is ready
     useEffect(() => {
@@ -514,7 +514,7 @@ export default function ClientProjectsPage() {
     };
 
     if (!isSessionLoading && session?.user.role !== "CLIENT") {
-        return redirect("/home");
+        // return redirect("/home");
     }
 
     if (!isMounted) {
