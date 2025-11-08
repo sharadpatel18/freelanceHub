@@ -44,3 +44,14 @@ export const getAllProjects = async () => {
     throw new Error("Failed to get all projects");
   }
 };
+
+export const getProjectById = async (id: string) => {
+  try {
+    const responce = await axios.get(`/api/projects/${id}`);
+    return responce.data;
+  } catch (error) {
+    console.error(error);
+    toast.error("Failed to get project");
+    throw new Error("Failed to get project");
+  }
+};

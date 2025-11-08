@@ -37,6 +37,7 @@ import {
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { getAllProjects } from "@/services/projects-services"
+import { redirect } from "next/navigation"
 
 export default function Page() {
     const [isMounted, setIsMounted] = useState(false)
@@ -72,6 +73,11 @@ export default function Page() {
     const getStatusText = (status: string) => {
         return status.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
     }
+
+    const handleShowDetails = (id: string) => {
+        redirect(`/projects/${id}`);
+    }
+
     if (!isMounted) {
         return null
     }
@@ -104,10 +110,6 @@ export default function Page() {
                                         Manage and track all your freelance projects in one place
                                     </p>
                                 </div>
-                                <Button className="mt-4 md:mt-0 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary">
-                                    <Plus className="h-4 w-4 mr-2" />
-                                    New Project
-                                </Button>
                             </div>
 
                             {/* Search and Filter */}
@@ -166,7 +168,7 @@ export default function Page() {
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleShowDetails(project.id)}>
                                                         <Eye className="h-4 w-4 mr-2" />
                                                         View Details
                                                     </DropdownMenuItem>

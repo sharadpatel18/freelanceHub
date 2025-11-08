@@ -15,17 +15,26 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { signIn } from "next-auth/react"
 import { toast } from "sonner"
 import { useSession } from "next-auth/react"
 import { redirect } from "next/navigation"
+import { useAuthStore } from "@/store/user-store"
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const { data: session } = useSession()
+  const { data: session } = useSession();
+  const { setUser } = useAuthStore();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+
   const [formData, setFormData] = useState({
     email: "",
     password: ""
@@ -49,21 +58,34 @@ export function LoginForm({
     } else {
       toast.error("Login failed!")
     }
-
-    if (res?.ok && session?.user) {
-      redirect("/home")
-    } else {
-      redirect("/profile/form")
-    }
   }
 
   const handleGoogleSubmit = async () => {
     await signIn("google", {
-      redirect: false,
-      callbackUrl: "/profile/form"
+      redirect: true,
     })
   }
 
+  useEffect(() => {
+    console.log(session?.user);
+
+    if (session && session.user.isVerified === true) {
+      setUser({
+        success: true,
+        message: "Login successful!",
+        data: session.user
+      });
+      redirect("/home");
+    }
+
+    if (session && session.user.isVerified === false) {
+      redirect("/profile/form");
+    }
+  }, [session, setUser])
+
+  if (!isMounted) {
+    return null;
+  }
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>

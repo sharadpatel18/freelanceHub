@@ -85,7 +85,6 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      // Initialize store from localStorage (useful for SSR/SSG)
       initializeFromLocalStorage: () => {
         try {
           const storage = localStorage.getItem("auth-storage");
@@ -109,9 +108,8 @@ export const useAuthStore = create<AuthState>()(
       },
     }),
     {
-      name: "auth-storage", // localStorage key
+      name: "auth-storage",
       storage: createJSONStorage(() => localStorage),
-      // Only persist these fields
       partialize: (state) => ({
         user: state.user,
         token: state.token,

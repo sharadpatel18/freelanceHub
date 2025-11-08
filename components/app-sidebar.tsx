@@ -106,6 +106,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return null;
   }
   if (!user) return null
+  console.log("user", user);
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -124,7 +126,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={data.navMain} />
         {
           user.data.role === "CLIENT" &&
-          <NavClient items={data.navClient} className="mt-auto" />
+          <NavClient items={data.navClient} className="" />
         }
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
