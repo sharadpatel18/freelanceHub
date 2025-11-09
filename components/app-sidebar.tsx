@@ -47,11 +47,6 @@ const data = {
       icon: Briefcase,
     },
     {
-      title: "Proposals",
-      url: "/proposals",
-      icon: FileText,
-    },
-    {
       title: "Messages",
       url: "/messages",
       icon: MessageCircle,
@@ -90,6 +85,11 @@ const data = {
       url: "/client/my-projects",
       icon: Workflow
     },
+    {
+      title: "Proposals",
+      url: "/client/proposals",
+      icon: FileText,
+    }
   ]
 }
 
@@ -106,7 +106,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return null;
   }
   if (!user) return null
-  console.log("user", user);
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -116,7 +115,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <div className="p-2 bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg">
               <Briefcase className="h-6 w-6 text-primary" />
             </div>
-            <span className="text-lg font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            <span className="text-lg font-bold">
               FreelanceHub
             </span>
           </SidebarMenuItem>

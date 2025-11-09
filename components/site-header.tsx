@@ -6,6 +6,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 import { Sun, Moon } from "lucide-react"
 import { useTheme } from "next-themes"
+import NotificationBellComponent from "./notification-bell"
 
 export function SiteHeader() {
   const path = usePathname();
@@ -22,6 +23,7 @@ export function SiteHeader() {
         <h1 className="text-base font-medium">{path.replace("/", "")}</h1>
       </div>
       <div className="flex items-center gap-2">
+        <NotificationBellComponent />
         <Button
           variant="ghost"
           size="icon"

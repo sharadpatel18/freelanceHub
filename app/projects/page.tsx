@@ -99,7 +99,6 @@ export default function Page() {
                     <section className="py-8 px-6 relative overflow-hidden">
                         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5" />
                         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-
                         <div className="container mx-auto relative z-10">
                             <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6">
                                 <div>

@@ -386,10 +386,10 @@ function ProjectCard({ project, onDelete }: { project: any, onDelete: (projectId
                     </Badge>
                 </div>
                 <div className="flex gap-2">
-                    <Button variant="ghost" size="icon" className="text-blue-600 hover:text-blue-700">
+                    <Button variant="ghost" size="icon">
                         <Eye className="w-4 h-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" className="hover:text-gray-700">
+                    <Button variant="ghost" size="icon">
                         <Edit className="w-4 h-4" />
                     </Button>
                     <Button
@@ -436,7 +436,7 @@ function ProjectCard({ project, onDelete }: { project: any, onDelete: (projectId
                 </div>
                 <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4" />
-                    <span className="font-medium text-blue-600">{project.proposalsCount || 0} proposals</span>
+                    <span className="font-medium">{project.proposalsCount || 0} proposals</span>
                 </div>
             </div>
         </div>
@@ -533,8 +533,8 @@ export default function ClientProjectsPage() {
             <AppSidebar variant="inset" />
             <SidebarInset>
                 <SiteHeader />
-                <div className="min-h-screen p-6">
-                    <div className="max-w-7xl mx-auto">
+                <div className="min-h-screen inset-0 bg-background bg-gradient-to-br from-primary/5 via-background to-secondary/5">
+                    <div className="py-8 px-10 relative overflow-hidden">
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                             <div>
                                 <h1 className="text-3xl font-bold mb-2">My Projects</h1>
@@ -548,12 +548,12 @@ export default function ClientProjectsPage() {
                                 <div className="text-2xl font-bold">{stats.total}</div>
                                 <div className="text-sm">Total Projects</div>
                             </div>
-                            <div className="rounded-lg border border-green-200 p-4">
-                                <div className="text-2xl font-bold text-green-600">{stats.open}</div>
+                            <div className="rounded-lg border p-4">
+                                <div className="text-2xl font-bold">{stats.open}</div>
                                 <div className="text-sm">Open</div>
                             </div>
-                            <div className="rounded-lg border border-blue-200 p-4">
-                                <div className="text-2xl font-bold text-blue-600">{stats.inProgress}</div>
+                            <div className="rounded-lg border p-4">
+                                <div className="text-2xl font-bold">{stats.inProgress}</div>
                                 <div className="text-sm">In Progress</div>
                             </div>
                             <div className="rounded-lg border p-4">
@@ -588,7 +588,7 @@ export default function ClientProjectsPage() {
 
                         {isLoadingProjects ? (
                             <div className="flex justify-center items-center py-12">
-                                <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+                                <Loader2 className="w-8 h-8 animate-spin" />
                                 <span className="ml-2">Loading projects...</span>
                             </div>
                         ) : filteredProjects.length > 0 ? (
