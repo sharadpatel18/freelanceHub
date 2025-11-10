@@ -24,6 +24,7 @@ import { useParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { getProjectById } from '@/services/projects-services';
 import { ProjectType } from '@/types/projects';
+import FreelanceEstimationForm from '@/components/estimate';
 
 export default function ProjectDetailPage() {
     const { id }: { id: string } = useParams();
@@ -238,10 +239,11 @@ export default function ProjectDetailPage() {
                                         {/* Action Buttons */}
                                         <Card>
                                             <CardContent className="pt-6 space-y-3">
-                                                <Button className="w-full" size="lg">
+                                                {/* <Button className="w-full" size="lg">
                                                     <Send className="mr-2 h-4 w-4" />
                                                     Submit Proposal
-                                                </Button>
+                                                </Button> */}
+                                                <FreelanceEstimationForm />
                                                 <Button variant="outline" className="w-full" size="lg">
                                                     Save Project
                                                 </Button>
