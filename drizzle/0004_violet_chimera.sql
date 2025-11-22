@@ -1,0 +1,1 @@
+ALTER TABLE "estimates" ALTER COLUMN "amount" SET DATA TYPE double precision;

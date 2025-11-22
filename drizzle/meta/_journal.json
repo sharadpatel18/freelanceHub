@@ -22,6 +22,27 @@
       "when": 1762353306820,
       "tag": "0002_sloppy_crystal",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1762980865022,
+      "tag": "0003_peaceful_nova",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1762981981980,
+      "tag": "0004_violet_chimera",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1762982085389,
+      "tag": "0005_wide_hemingway",
+      "breakpoints": true
     }
   ]
 }

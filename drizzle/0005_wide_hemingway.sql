@@ -1,0 +1,1 @@
+ALTER TABLE "estimates" ALTER COLUMN "valid_until" SET DATA TYPE timestamp;
