@@ -27,3 +27,25 @@ export const getEstimateByProjectId = async (projectId: string) => {
     throw new Error("Failed to get estimate");
   }
 };
+
+export const getEstimateById = async (id: string) => {
+  try {
+    const response = await axios.get(`/api/projects/estimate/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    toast.error("somethning went wrong");
+    throw new Error("failed to get estimate");
+  }
+};
+
+export const getEstimateByUserId = async () => {
+  try {
+    const response = await axios.get("/api/projects/estimate/user");
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    toast.error("something went wrong");
+    throw new Error("failed to get estimate");
+  }
+};
