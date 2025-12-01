@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
-import { projects, budgetTypeEnum, projectStatusEnum } from "./schema/projects";
+import { projects } from "./schema/projects";
 
 // 1. Connect to DB
 const pool = new Pool({

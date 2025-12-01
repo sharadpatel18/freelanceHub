@@ -13,9 +13,9 @@ import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
 import { SiteHeader } from '@/components/site-header';
 import { useSession } from 'next-auth/react';
-import { redirect } from 'next/navigation';
 import { createProject, getProjectByUserId, deleteProjectByUserId } from '@/services/projects-services';
 import { useAuthStore } from '@/store/user-store';
+import { useProjectStore } from '@/store/projects-store';
 import { ProjectType } from '@/types/projects';
 
 const categories = [
@@ -54,7 +54,7 @@ const statusLabels: { [key: string]: string } = {
     cancelled: 'Cancelled'
 };
 
-function ProjectFormDialog({ onProjectCreated }: { onProjectCreated: (project: any) => void }) {
+function ProjectFormDialog() {
     const [open, setOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
@@ -109,7 +109,7 @@ function ProjectFormDialog({ onProjectCreated }: { onProjectCreated: (project: a
             const res = await createProject(projectData);
 
             // Pass the created project back to parent
-            onProjectCreated(res);
+            // onProjectCreated(res);
 
             // Reset form
             setFormData({
@@ -448,8 +448,9 @@ export default function ClientProjectsPage() {
     const [isSessionLoading, setIsSessionLoading] = useState(true);
     const { data: session } = useSession();
     const { getUserFromLocalStorage } = useAuthStore();
+    const { projects } = useProjectStore.getState();
     // State for projects and UI
-    const [projects, setProjects] = useState<ProjectType[]>([]);
+    // const [projects, setProjects] = useState<ProjectType[]>([]);
     const [isLoadingProjects, setIsLoadingProjects] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');
@@ -472,8 +473,12 @@ export default function ClientProjectsPage() {
 
             setIsLoadingProjects(true);
             try {
-                const data = await getProjectByUserId(); // Replace with your API endpoint
-                setProjects(data.data);
+                if (projects.length === 0) {
+                    await getProjectByUserId();
+                }
+
+                // Replace with your API endpoint
+
             } catch (error) {
                 console.error('Error fetching projects:', error);
             } finally {
@@ -484,17 +489,17 @@ export default function ClientProjectsPage() {
         if (!isSessionLoading && session) {
             fetchProjects();
         }
-    }, [session, isSessionLoading]);
+    }, [session, isSessionLoading, projects]);
 
-    const handleProjectCreated = (newProject: any) => {
-        setProjects([newProject, ...projects]);
-        alert('Project created successfully!');
-    };
+    // const handleProjectCreated = (newProject: any) => {
+    //     setProjects([newProject, ...projects]);
+    //     alert('Project created successfully!');
+    // };
 
     const handleDeleteProject = async (projectId: string) => {
         if (confirm('Are you sure you want to delete this project?')) {
             await deleteProjectByUserId(projectId);
-            setProjects(projects.filter(p => p.id !== projectId));
+            // setProjects(projects.filter(p => p.id !== projectId));
         }
     };
 
@@ -540,7 +545,7 @@ export default function ClientProjectsPage() {
                                 <h1 className="text-3xl font-bold mb-2">My Projects</h1>
                                 <p>Manage and track all your posted projects</p>
                             </div>
-                            <ProjectFormDialog onProjectCreated={handleProjectCreated} />
+                            <ProjectFormDialog />
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
@@ -611,7 +616,7 @@ export default function ClientProjectsPage() {
                                         : 'Get started by posting your first project'}
                                 </p>
                                 {!searchQuery && filterStatus === 'all' && (
-                                    <ProjectFormDialog onProjectCreated={handleProjectCreated} />
+                                    <ProjectFormDialog />
                                 )}
                             </div>
                         )}

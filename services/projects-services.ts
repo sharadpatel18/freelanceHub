@@ -1,9 +1,13 @@
 import axios from "axios";
 import { toast } from "sonner";
+import { useProjectStore } from "@/store/projects-store";
+
+const { setProjects } = useProjectStore.getState();
 
 export const createProject = async (data: any) => {
   try {
     const responce = await axios.post("/api/projects", data);
+
     return responce.data;
   } catch (error) {
     console.error(error);
@@ -14,7 +18,9 @@ export const createProject = async (data: any) => {
 
 export const getProjectByUserId = async () => {
   try {
+    // const { setProjects } = useProjectStore.getState();
     const responce = await axios.get("/api/projects");
+    setProjects(responce.data.data);
     return responce.data;
   } catch (error) {
     console.error(error);
@@ -37,7 +43,8 @@ export const deleteProjectByUserId = async (id: string) => {
 export const getAllProjects = async () => {
   try {
     const responce = await axios.get("/api/projects/all-project");
-    return responce.data;
+    setProjects(responce.data.data);
+    // return responce.data;
   } catch (error) {
     console.error(error);
     toast.error("Something went wrong");
@@ -48,6 +55,7 @@ export const getAllProjects = async () => {
 export const getProjectById = async (id: string) => {
   try {
     const responce = await axios.get(`/api/projects/${id}`);
+    setProjects(responce.data.data);
     return responce.data;
   } catch (error) {
     console.error(error);

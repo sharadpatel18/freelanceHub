@@ -27,29 +27,30 @@ import { SiteHeader } from "@/components/site-header";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
 import { getProjectById } from "@/services/projects-services";
-import type { ProjectType } from "@/types/projects";
 import FreelanceEstimationForm from "@/components/estimate";
+import { useProjectStore } from "@/store/projects-store";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ProjectDetailPage() {
     const { id }: { id: string } = useParams();
-    const [project, setProject] = useState<ProjectType>();
+    const projects = useProjectStore((state) => state.projects);
+    console.log(projects);
+
+    // const [project, setProject] = useState<ProjectType>();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchedProject = async () => {
+        const fetchedProjects = async () => {
             try {
-                setLoading(true);
-                const data = await getProjectById(id);
-                setProject(data.data[0]);
+                await getProjectById(id)
             } catch (error) {
                 console.error("Error fetching project:", error);
-                toast.error("Failed to fetch project details.");
+                toast.error("Failed to fetch projectsdetails.");
             } finally {
                 setLoading(false);
             }
         };
-        fetchedProject();
+        fetchedProjects();
     }, [id]);
 
     const formatBudget = (min: number, max: number, type: string) => {
@@ -164,24 +165,24 @@ export default function ProjectDetailPage() {
                                     </Card>
                                 </div>
                             </div>
-                        ) : project ? (
-                            // ================== PROJECT DATA ==================
+                        ) : Object.keys(projects).length !== 0 ? (
+                            // ================== projectsDATA ==================
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                                 {/* Left Side */}
                                 <div className="lg:col-span-2 space-y-6">
                                     <Card>
                                         <CardHeader>
                                             <CardTitle className="text-3xl mb-3">
-                                                {project.title}
+                                                {projects[0].title}
                                             </CardTitle>
                                             <div className="flex flex-wrap gap-2 mb-4">
-                                                <Badge variant="outline">{project.category}</Badge>
-                                                <Badge variant="outline">{project.subCategory}</Badge>
+                                                <Badge variant="outline">{projects[0].category}</Badge>
+                                                <Badge variant="outline">{projects[0].subCategory}</Badge>
                                             </div>
                                             <CardDescription className="flex items-center gap-2 text-sm">
                                                 <Calendar className="h-4 w-4" />
                                                 Posted on{" "}
-                                                {new Date(project.createdAt).toLocaleDateString()}
+                                                {new Date(projects[0].createdAt).toLocaleDateString()}
                                             </CardDescription>
                                         </CardHeader>
 
@@ -191,10 +192,10 @@ export default function ProjectDetailPage() {
                                                 <div>
                                                     <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
                                                         <FileText className="h-5 w-5" />
-                                                        Project Description
+                                                        projectsDescription
                                                     </h3>
                                                     <p className="leading-relaxed">
-                                                        {project.description}
+                                                        {projects[0].description}
                                                     </p>
                                                 </div>
 
@@ -207,7 +208,7 @@ export default function ProjectDetailPage() {
                                                         Skills Required
                                                     </h3>
                                                     <div className="flex flex-wrap gap-2">
-                                                        {project.skills.map((skill) => (
+                                                        {projects[0].skills.map((skill) => (
                                                             <Badge
                                                                 key={skill}
                                                                 variant="secondary"
@@ -227,7 +228,7 @@ export default function ProjectDetailPage() {
                                 <div className="space-y-6">
                                     <Card>
                                         <CardHeader>
-                                            <CardTitle>Project Details</CardTitle>
+                                            <CardTitle>projectsDetails</CardTitle>
                                         </CardHeader>
                                         <CardContent className="space-y-4">
                                             <div className="flex items-start gap-3">
@@ -236,13 +237,13 @@ export default function ProjectDetailPage() {
                                                     <p className="text-sm mb-1">Budget</p>
                                                     <p className="font-semibold text-lg">
                                                         {formatBudget(
-                                                            project.minBudget,
-                                                            project.maxBudget,
-                                                            project.budgetType
+                                                            projects[0].minBudget,
+                                                            projects[0].maxBudget,
+                                                            projects[0].budgetType
                                                         )}
                                                     </p>
                                                     <p className="text-xs mt-1 capitalize">
-                                                        {project.budgetType} Rate
+                                                        {projects[0].budgetType} Rate
                                                     </p>
                                                 </div>
                                             </div>
@@ -254,7 +255,7 @@ export default function ProjectDetailPage() {
                                                 <div className="flex-1">
                                                     <p className="text-sm mb-1">Duration</p>
                                                     <p className="font-semibold">
-                                                        {project.expectedDuration}
+                                                        {projects[0].expectedDuration}
                                                     </p>
                                                 </div>
                                             </div>
@@ -266,7 +267,7 @@ export default function ProjectDetailPage() {
                                                 <div className="flex-1">
                                                     <p className="text-sm mb-1">Location</p>
                                                     <p className="font-semibold capitalize">
-                                                        {project.locationPreference}
+                                                        {projects[0].locationPreference}
                                                     </p>
                                                 </div>
                                             </div>
@@ -282,7 +283,7 @@ export default function ProjectDetailPage() {
                                                 <div className="flex items-center gap-3">
                                                     <Avatar className="h-12 w-12">
                                                         <AvatarFallback className="text-lg">
-                                                            {project.user.name
+                                                            {projects[0].user.name
                                                                 .split(" ")
                                                                 .map((n) => n[0])
                                                                 .join("")}
@@ -290,7 +291,7 @@ export default function ProjectDetailPage() {
                                                     </Avatar>
                                                     <div>
                                                         <p className="font-semibold">
-                                                            {project.user.name}
+                                                            {projects[0].user.name}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -309,7 +310,7 @@ export default function ProjectDetailPage() {
 
                                     <Card>
                                         <CardContent className="pt-6 space-y-3">
-                                            <FreelanceEstimationForm project={project} />
+                                            <FreelanceEstimationForm project={projects[0]} />
                                             <Button variant="outline" className="w-full" size="lg">
                                                 Save Project
                                             </Button>
@@ -318,7 +319,7 @@ export default function ProjectDetailPage() {
                                 </div>
                             </div>
                         ) : (
-                            <p className="text-muted-foreground">No project found.</p>
+                            <p className="text-muted-foreground">No projectsfound.</p>
                         )}
                     </div>
                 </div>

@@ -37,22 +37,21 @@ import {
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { getAllProjects } from "@/services/projects-services"
+import { useProjectStore } from "@/store/projects-store"
 import { redirect } from "next/navigation"
 
 export default function Page() {
+    const { projects } = useProjectStore.getState();
     const [isMounted, setIsMounted] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [projects, setProjects] = useState<ProjectType[]>([])
+    // const [projects, setProjects] = useState<ProjectType[]>([])
 
     useEffect(() => {
         setIsMounted(true)
         const fetchProjects = async () => {
             try {
                 setLoading(true);
-                const data = await getAllProjects();
-                setProjects(data.data);
-                console.log(data.data);
-
+                await getAllProjects();
             } catch (error) {
                 console.error(error)
                 toast.error("Something went wrong")
